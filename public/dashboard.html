@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevTrack — Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+  <div class="dash-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">Dev<span>Track</span></div>
+      <nav>
+        <div class="nav-item active" onclick="showSection('logs')">📋 Logs</div>
+        <div class="nav-item" onclick="showSection('projects')">🚀 Projects</div>
+        <div class="nav-item" onclick="window.location.href='/pair.html'">🎥 Pair Session</div>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="user-badge">
+          <div class="user-avatar" id="userAvatar">M</div>
+          <div class="user-name" id="userName">miraj</div>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- LOGS SECTION -->
+      <div class="section active" id="logsSection">
+        <div class="section-header">
+          <h2>Coding Logs</h2>
+          <button class="btn-add" onclick="openLogModal()">+ New Log</button>
+        </div>
+        <div class="cards-grid" id="logsGrid">
+          <div class="empty-state">// no logs yet</div>
+        </div>
+      </div>
+
+      <!-- PROJECTS SECTION -->
+      <div class="section" id="projectsSection">
+        <div class="section-header">
+          <h2>Projects</h2>
+          <button class="btn-add" onclick="openProjectModal()">+ New Project</button>
+        </div>
+        <div class="cards-grid" id="projectsGrid">
+          <div class="empty-state">// no projects yet</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- LOG MODAL -->
+  <div class="modal-overlay" id="logModal">
+    <div class="modal">
+      <h3 id="logModalTitle">New Log</h3>
+      <input type="hidden" id="logId">
+      <div class="form-group">
+        <label>DATE</label>
+        <input type="date" id="logDate">
+      </div>
+      <div class="form-group">
+        <label>HOURS</label>
+        <input type="number" id="logHours" min="0" max="24" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>TASKS</label>
+        <input type="text" id="logTasks" placeholder="what did you work on?">
+      </div>
+      <div class="form-group">
+        <label>NOTES</label>
+        <textarea id="logNotes" placeholder="any notes..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('logModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveLog()">Save Log</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECT MODAL -->
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal">
+      <h3 id="projectModalTitle">New Project</h3>
+      <input type="hidden" id="projectId">
+      <div class="form-group">
+        <label>PROJECT NAME</label>
+        <input type="text" id="projectName" placeholder="project name">
+      </div>
+      <div class="form-group">
+        <label>DESCRIPTION</label>
+        <textarea id="projectDesc" placeholder="what is this project?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>STATUS</label>
+        <select id="projectStatus">
+          <option value="active">Active</option>
+          <option value="paused">Paused</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('projectModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProject()">Save Project</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/logs.js"></script>
+  <script src="/js/projects.js"></script>
+  <script>
+    // auth guard
+    const token = localStorage.getItem('authToken');
+    if (!token) window.location.href = '/';
+
+    // set username display
+    const username = localStorage.getItem('username') || 'user';
+    document.getElementById('userName').textContent = username;
+    document.getElementById('userAvatar').textContent = username[0].toUpperCase();
+
+    function showSection(name) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById(name + 'Section').classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('username');
+      window.location.href = '/';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // load data on start
+    loadLogs();
+    loadProjects();
+  </script>
+</body>
+</html>
